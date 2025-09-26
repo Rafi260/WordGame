@@ -11,6 +11,11 @@ public class JarController : MonoBehaviour
 
     public void RespawnBall(char letter)
     {
-        if (spawner != null) spawner.SpawnWithLetter(letter);
+        if (spawner != null)
+        {
+            LetterPool.GetTierForLetter(letter);
+        }
+spawner.SpawnWithLetter(letter);
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Buffers.Text;
+using System.Collections;
 using UnityEngine;
 
 public class BallSpawner2D : MonoBehaviour
@@ -32,6 +33,8 @@ public class BallSpawner2D : MonoBehaviour
 
     private float _timer;
 
+    bool pause = false;
+
     private void Awake()
     {
         ApplyTierProbabilities();
@@ -52,6 +55,9 @@ public class BallSpawner2D : MonoBehaviour
 
     private void Update()
     {
+        if (pause) return;
+
+
         _timer += Time.deltaTime;
         if (_timer >= spawnInterval)
         {
@@ -75,10 +81,17 @@ public class BallSpawner2D : MonoBehaviour
         }
     }
 
+    float GetXPos()
+    {
+        float baseX = Random.Range(-spawnXRange, spawnXRange);
+        float x = baseX + Random.Range(-burstSpreadX, burstSpreadX);
+        x = Mathf.Clamp(x, -spawnXRange, spawnXRange);
+        return x;
+    }
+
     public void SpawnWithLetter(char letter)
     {
-        // If you want to infer tier by letter, add a helper; default to Common
-        SpawnWithLetterAndTierAt(letter, LetterTier.Common, new Vector3(Random.Range(-spawnXRange, spawnXRange), spawnY, 0f));
+        SpawnWithLetterAndTierAt(letter, LetterPool.GetTierForLetter(letter), new Vector3(Random.Range(-spawnXRange, spawnXRange), spawnY, 0f));
     }
 
     private void SpawnWithLetterAndTierAt(char letter, LetterTier tier, Vector3 pos)
@@ -111,5 +124,10 @@ public class BallSpawner2D : MonoBehaviour
             case LetterTier.Rare: return ballPrefabRare ?? ballPrefabDefault ?? ballPrefabCommon ?? ballPrefabMedium;
             default: return ballPrefabDefault ?? ballPrefabCommon ?? ballPrefabMedium ?? ballPrefabRare;
         }
+    }
+
+    public void TogglePause()
+    {
+        pause = !pause;
     }
 }
